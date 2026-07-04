@@ -16,14 +16,16 @@ const {
     authorize
 } = require("../middleware/authMiddleware");
 
+
+// Logged in Users
 // ADMIN
 router.post("/", protect, authorize("ADMIN"), createDoctor);
 router.put("/:id", protect, authorize("ADMIN"), updateDoctor);
 router.delete("/:id", protect, authorize("ADMIN"), deleteDoctor);
 
-// Logged in Users
-router.get("/", protect, getDoctors);
-router.get("/search", protect, searchDoctors);
-router.get("/:id", protect, getDoctorById);
+// PUBLIC
+router.get("/", getDoctors);
+router.get("/search", searchDoctors);
+router.get("/:id", getDoctorById);
 
 module.exports = router;

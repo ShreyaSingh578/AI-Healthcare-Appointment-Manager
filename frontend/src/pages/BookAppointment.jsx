@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 
 import API from "../services/api";
+import { useAuth } from "../context/AuthContext";
 
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -13,11 +14,11 @@ function BookAppointment() {
 
     const navigate = useNavigate();
 
+    const { user } = useAuth();
+
     const [doctor, setDoctor] = useState(null);
 
     const [formData, setFormData] = useState({
-        patientName: "",
-        patientEmail: "",
         appointmentDate: "",
         symptoms: ""
     });
@@ -60,8 +61,17 @@ function BookAppointment() {
         try {
 
             await API.post("/appointments", {
-                ...formData,
-                doctorId
+
+                patientName: user.name,
+
+                patientEmail: user.email,
+
+                doctorId: Number(doctorId),
+
+                appointmentDate: formData.appointmentDate,
+
+                symptoms: formData.symptoms
+
             });
 
             toast.success("Appointment booked successfully.");
@@ -71,8 +81,11 @@ function BookAppointment() {
         } catch (error) {
 
             toast.error(
+
                 error.response?.data?.message ||
+
                 "Booking failed."
+
             );
 
         }
@@ -113,9 +126,15 @@ function BookAppointment() {
 
                                             </h5>
 
-                                            <p>
+                                            <p className="mb-1">
 
-                                                {doctor.specialization}
+                                                <strong>Specialization:</strong> {doctor.specialization}
+
+                                            </p>
+
+                                            <p className="mb-0">
+
+                                                <strong>Consultation Fee:</strong> ₹{doctor.consultationFee}
 
                                             </p>
 
@@ -125,89 +144,113 @@ function BookAppointment() {
 
                                 }
 
+                                <div className="mb-3">
+
+                                    <label className="form-label">
+
+                                        Patient Name
+
+                                    </label>
+
+                                    <input
+
+                                        type="text"
+
+                                        className="form-control"
+
+                                        value={user?.name || ""}
+
+                                        disabled
+
+                                    />
+
+                                </div>
+
+                                <div className="mb-3">
+
+                                    <label className="form-label">
+
+                                        Email
+
+                                    </label>
+
+                                    <input
+
+                                        type="email"
+
+                                        className="form-control"
+
+                                        value={user?.email || ""}
+
+                                        disabled
+
+                                    />
+
+                                </div>
+
                                 <form onSubmit={handleSubmit}>
 
                                     <div className="mb-3">
 
-                                        <label>
-
-                                            Patient Name
-
-                                        </label>
-
-                                        <input
-                                            type="text"
-                                            name="patientName"
-                                            className="form-control"
-                                            value={formData.patientName}
-                                            onChange={handleChange}
-                                            required
-                                        />
-
-                                    </div>
-
-                                    <div className="mb-3">
-
-                                        <label>
-
-                                            Email
-
-                                        </label>
-
-                                        <input
-                                            type="email"
-                                            name="patientEmail"
-                                            className="form-control"
-                                            value={formData.patientEmail}
-                                            onChange={handleChange}
-                                            required
-                                        />
-
-                                    </div>
-
-                                    <div className="mb-3">
-
-                                        <label>
+                                        <label className="form-label">
 
                                             Appointment Date
 
                                         </label>
 
                                         <input
+
                                             type="datetime-local"
+
                                             name="appointmentDate"
+
                                             className="form-control"
+
                                             value={formData.appointmentDate}
+
                                             onChange={handleChange}
+
                                             required
+
                                         />
 
                                     </div>
 
                                     <div className="mb-4">
 
-                                        <label>
+                                        <label className="form-label">
 
                                             Symptoms
 
                                         </label>
 
                                         <textarea
+
                                             rows="4"
+
                                             name="symptoms"
+
                                             className="form-control"
+
                                             value={formData.symptoms}
+
                                             onChange={handleChange}
+
+                                            placeholder="Describe your symptoms..."
+
                                             required
+
                                         />
 
                                     </div>
 
                                     <button
+
                                         className="btn btn-success w-100"
+
                                     >
 
-                                        Book Appointment
+                                        Confirm Appointment
 
                                     </button>
 

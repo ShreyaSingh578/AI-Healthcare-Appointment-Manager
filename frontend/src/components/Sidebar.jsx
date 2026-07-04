@@ -58,7 +58,7 @@ function Sidebar() {
 
                     <Link
                         className="nav-link text-white"
-                        to="/dashboard"
+                        to="/admin"
                     >
 
                         <FaCalendarAlt className="me-2" />

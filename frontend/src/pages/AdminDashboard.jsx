@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
@@ -10,13 +11,12 @@ import API from "../services/api";
 function AdminDashboard() {
 
     const [doctors, setDoctors] = useState([]);
-
     const [appointments, setAppointments] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
 
         fetchDoctors();
-
         fetchAppointments();
 
     }, []);
@@ -31,7 +31,7 @@ function AdminDashboard() {
 
         } catch (error) {
 
-            console.log(error);
+            toast.error("Unable to load doctors.");
 
         }
 
@@ -47,7 +47,11 @@ function AdminDashboard() {
 
         } catch (error) {
 
-            console.log(error);
+            toast.error("Unable to load appointments.");
+
+        } finally {
+
+            setLoading(false);
 
         }
 
@@ -55,19 +59,58 @@ function AdminDashboard() {
 
     const deleteDoctor = async (id) => {
 
+        const confirmed = window.confirm(
+            "Are you sure you want to delete this doctor?"
+        );
+
+        if (!confirmed) return;
+
         try {
 
             await API.delete(`/doctors/${id}`);
+
+            toast.success("Doctor deleted successfully.");
 
             fetchDoctors();
 
         } catch (error) {
 
-            console.log(error);
+            toast.error(
+                error.response?.data?.message ||
+                "Unable to delete doctor."
+            );
 
         }
 
     };
+
+    if (loading) {
+
+        return (
+
+            <>
+                <Navbar />
+
+                <div className="container text-center py-5">
+
+                    <div
+                        className="spinner-border text-primary"
+                        role="status"
+                    >
+                        <span className="visually-hidden">
+
+                            Loading...
+
+                        </span>
+                    </div>
+
+                </div>
+
+            </>
+
+        );
+
+    }
 
     return (
 
@@ -87,29 +130,27 @@ function AdminDashboard() {
 
                     <div className="col-md-9 p-4">
 
-                        <h2>
+                        <h2 className="mb-4">
 
                             Admin Dashboard
 
                         </h2>
 
-                        <hr />
-
                         <DoctorForm
                             refreshDoctors={fetchDoctors}
                         />
 
-                        <hr />
+                        <hr className="my-5" />
 
-                        <h3>
+                        <h3 className="mb-3">
 
                             Doctors
 
                         </h3>
 
-                        <table className="table table-striped">
+                        <table className="table table-striped table-hover">
 
-                            <thead>
+                            <thead className="table-primary">
 
                                 <tr>
 
@@ -129,13 +170,15 @@ function AdminDashboard() {
 
                                 {
 
+                                    doctors.length > 0 ?
+
                                     doctors.map((doctor) => (
 
                                         <tr key={doctor.id}>
 
                                             <td>
 
-                                                {doctor.name}
+                                                Dr. {doctor.name}
 
                                             </td>
 
@@ -156,7 +199,9 @@ function AdminDashboard() {
                                                 <button
                                                     className="btn btn-danger btn-sm"
                                                     onClick={() =>
-                                                        deleteDoctor(doctor.id)
+                                                        deleteDoctor(
+                                                            doctor.id
+                                                        )
                                                     }
                                                 >
 
@@ -169,6 +214,25 @@ function AdminDashboard() {
                                         </tr>
 
                                     ))
+
+                                    :
+
+                                    (
+
+                                        <tr>
+
+                                            <td
+                                                colSpan="4"
+                                                className="text-center"
+                                            >
+
+                                                No doctors found.
+
+                                            </td>
+
+                                        </tr>
+
+                                    )
 
                                 }
 

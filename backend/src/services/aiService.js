@@ -1,50 +1,81 @@
-const OpenAI = require("openai");
+const { GoogleGenAI } = require("@google/genai");
 
-const client = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
+const ai = new GoogleGenAI({
+    apiKey: process.env.GEMINI_API_KEY
 });
 
+// =========================
 // Generate Pre-Visit Summary
+// =========================
 const generatePreVisitSummary = async (symptoms) => {
-    const response = await client.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-            {
-                role: "system",
-                content: "You are a medical assistant."
-            },
-            {
-                role: "user",
-                content: `Summarize these patient symptoms briefly:\n${symptoms}`
-            }
-        ],
-        max_tokens: 150
-    });
 
-    return response.choices[0].message.content;
+    try {
+
+        const response = await ai.models.generateContent({
+
+            model: "gemini-2.5-flash",
+
+            contents: `
+You are an experienced medical assistant.
+
+Summarize the patient's symptoms professionally in 3-5 concise sentences.
+
+Symptoms:
+${symptoms}
+`
+
+        });
+
+        return response.text;
+
+    } catch (error) {
+
+        console.error("Gemini Error:", error.message);
+
+        return "Unable to generate AI pre-visit summary.";
+
+    }
+
 };
 
+// =========================
 // Generate Post-Visit Summary
+// =========================
 const generatePostVisitSummary = async (notes) => {
-    const response = await client.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-            {
-                role: "system",
-                content: "You are a medical assistant."
-            },
-            {
-                role: "user",
-                content: `Create a concise post-visit summary from these doctor notes:\n${notes}`
-            }
-        ],
-        max_tokens: 200
-    });
 
-    return response.choices[0].message.content;
+    try {
+
+        const response = await ai.models.generateContent({
+
+            model: "gemini-2.5-flash",
+
+            contents: `
+You are an experienced medical assistant.
+
+Generate a concise post-visit summary based on these doctor's notes.
+
+Doctor Notes:
+${notes}
+`
+
+        });
+
+        return response.text;
+
+    } catch (error) {
+
+        console.error("Gemini Error:", error.message);
+
+        return "Unable to generate AI post-visit summary.";
+
+    }
+
 };
 
 module.exports = {
+
     generatePreVisitSummary,
+
     generatePostVisitSummary
+
 };
