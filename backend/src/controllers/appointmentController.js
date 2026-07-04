@@ -194,15 +194,8 @@ const updateAppointment = async (req, res) => {
 
         // Generate AI Post Visit Summary
         const summary = await generatePostVisitSummary(postVisitNotes);
-        await prisma.medicationReminder.create({
-    data: {
-        medicine: prescription,
-        frequency: "Daily",
-        nextReminder: new Date(Date.now() + 24 * 60 * 60 * 1000), // Tomorrow
-        appointmentId: appointment.id
-    }
-});
 
+        // Update appointment
         const appointment = await prisma.appointment.update({
             where: {
                 id: Number(req.params.id)
@@ -212,6 +205,18 @@ const updateAppointment = async (req, res) => {
                 prescription,
                 postVisitSummary: summary,
                 status: "COMPLETED"
+            }
+        });
+
+        // Create medication reminder
+        await prisma.medicationReminder.create({
+            data: {
+                medicine: prescription,
+                frequency: "Daily",
+                nextReminder: new Date(
+                    Date.now() + 24 * 60 * 60 * 1000 // Tomorrow
+                ),
+                appointmentId: appointment.id
             }
         });
 

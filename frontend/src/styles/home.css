@@ -1,0 +1,37 @@
+body{
+    background:#f5f7fa;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+.hero{
+    padding:100px 20px;
+    background:linear-gradient(135deg,#1976d2,#42a5f5);
+    color:white;
+}
+
+.hero h1{
+    margin-bottom:25px;
+}
+
+.hero p{
+    max-width:750px;
+    margin:auto;
+}
+
+.card{
+    transition:.3s;
+    border:none;
+}
+
+.card:hover{
+    transform:translateY(-8px);
+}
+
+.cta-section{
+    background:#1976d2;
+    color:white;
+}
+
+footer{
+    margin-top:0;
+}

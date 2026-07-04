@@ -8,7 +8,14 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-const sendBookingConfirmation = async (email, doctorName, appointmentDate) => {
+// ==========================
+// Booking Confirmation Email
+// ==========================
+const sendBookingConfirmation = async (
+    email,
+    doctorName,
+    appointmentDate
+) => {
 
     await transporter.sendMail({
         from: process.env.EMAIL_USER,
@@ -31,6 +38,9 @@ const sendBookingConfirmation = async (email, doctorName, appointmentDate) => {
 
 };
 
+// ==========================
+// Appointment Cancellation
+// ==========================
 const sendCancellationEmail = async (email) => {
 
     await transporter.sendMail({
@@ -41,6 +51,37 @@ const sendCancellationEmail = async (email) => {
             <h2>Healthcare Appointment Manager</h2>
 
             <p>Your appointment has been cancelled.</p>
+
+            <p>If you wish, you can log in and book another appointment.</p>
+        `
+    });
+
+};
+
+// ==========================
+// Medication Reminder Email
+// ==========================
+const sendMedicationReminder = async (
+    email,
+    medicine
+) => {
+
+    await transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: "Medication Reminder",
+        html: `
+            <h2>Healthcare Appointment Manager</h2>
+
+            <p>This is your medication reminder.</p>
+
+            <p><strong>Medicine:</strong> ${medicine}</p>
+
+            <p>Please take your medicine as prescribed by your doctor.</p>
+
+            <br>
+
+            <p>Get well soon!</p>
         `
     });
 
@@ -48,5 +89,6 @@ const sendCancellationEmail = async (email) => {
 
 module.exports = {
     sendBookingConfirmation,
-    sendCancellationEmail
+    sendCancellationEmail,
+    sendMedicationReminder
 };
